@@ -1,6 +1,16 @@
+import dotenv from "dotenv";
+import mongoose from "mongoose";
+import Product from "./models/Product.js";
+import connectDB from "./config/db.js";
+
+dotenv.config();
+
+await connectDB();
+
+await mongoose.connection.dropDatabase().catch(() => {});
+
 const products = [
   {
-    _id: "1",
     name: "Wireless Headphones",
     description: "Premium noise-cancelling wireless headphones.",
     price: 149,
@@ -10,7 +20,6 @@ const products = [
     rating: 4.8,
   },
   {
-    _id: "2",
     name: "Smart Watch",
     description: "Fitness tracking smartwatch with AMOLED display.",
     price: 199,
@@ -20,7 +29,6 @@ const products = [
     rating: 4.7,
   },
   {
-    _id: "3",
     name: "Gaming Mouse",
     description: "High precision RGB gaming mouse.",
     price: 79,
@@ -30,7 +38,6 @@ const products = [
     rating: 4.6,
   },
   {
-    _id: "4",
     name: "Mechanical Keyboard",
     description: "RGB mechanical keyboard with blue switches.",
     price: 99,
@@ -40,7 +47,6 @@ const products = [
     rating: 4.8,
   },
   {
-    _id: "5",
     name: "Laptop",
     description: "Powerful laptop for work and gaming.",
     price: 999,
@@ -50,7 +56,6 @@ const products = [
     rating: 4.9,
   },
   {
-    _id: "6",
     name: "Smartphone",
     description: "Latest flagship smartphone.",
     price: 899,
@@ -60,7 +65,6 @@ const products = [
     rating: 4.7,
   },
   {
-    _id: "7",
     name: "Bluetooth Speaker",
     description: "Portable Bluetooth speaker with deep bass.",
     price: 129,
@@ -70,7 +74,6 @@ const products = [
     rating: 4.6,
   },
   {
-    _id: "8",
     name: "DSLR Camera",
     description: "Professional DSLR camera for creators.",
     price: 1199,
@@ -81,32 +84,9 @@ const products = [
   },
 ];
 
-// Get all products
-export const getProducts = async (req, res) => {
-  try {
-    res.status(200).json(products);
-  } catch (error) {
-    res.status(500).json({
-      message: error.message,
-    });
-  }
-};
+await Product.deleteMany();
+await Product.insertMany(products);
 
-// Get one product
-export const getProduct = async (req, res) => {
-  try {
-    const product = products.find((item) => item._id === req.params.id);
+console.log("✅ Products Seeded Successfully");
 
-    if (!product) {
-      return res.status(404).json({
-        message: "Product not found",
-      });
-    }
-
-    res.json(product);
-  } catch (error) {
-    res.status(500).json({
-      message: error.message,
-    });
-  }
-};
+process.exit();

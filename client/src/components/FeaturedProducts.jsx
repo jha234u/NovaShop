@@ -1,8 +1,27 @@
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Heart, ShoppingCart, Star } from "lucide-react";
-import { products } from "../data/products";
+import api from "../services/api";
 
 const FeaturedProducts = () => {
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await api.get("/products");
+        setProducts(response.data.slice(0, 4));
+      } catch (error) {
+        console.error("Failed to fetch products", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
   return (
     <section className="py-28 px-6 bg-[#09090B]">
       <div className="max-w-7xl mx-auto">
@@ -20,10 +39,16 @@ const FeaturedProducts = () => {
 
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
 
-          {products.map((product, index) => (
+          {loading ? (
+            Array.from({ length: 4 }).map((_, index) => (
+              <div key={index} className="rounded-3xl overflow-hidden bg-white/5 border border-white/10 p-6 h-96 animate-pulse" />
+            ))
+          ) : products.length === 0 ? (
+            <p className="text-gray-400 col-span-full text-center">No products available right now.</p>
+          ) : products.map((product, index) => (
 
             <motion.div
-              key={product.id}
+              key={product._id || product.id}
               initial={{ opacity: 0, y: 60 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -68,7 +93,7 @@ const FeaturedProducts = () => {
                 <div className="flex justify-between items-center mt-5">
 
                   <span className="text-2xl font-bold text-cyan-400">
-                    {product.price}
+                    ${product.price}
                   </span>
 
                   <button className="flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-purple-600 to-cyan-500 hover:scale-105 hover:shadow-[0_0_30px_rgba(139,92,246,0.5)] transition">
