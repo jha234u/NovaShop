@@ -71,10 +71,13 @@ const Navbar = () => {
             className="cursor-pointer hover:text-cyan-400 transition"
           />
 
-          <button className="flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-purple-600 to-cyan-500 hover:scale-105 transition">
+          <Link
+            to="/login"
+            className="flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-purple-600 to-cyan-500 hover:scale-105 transition"
+          >
             <FiUser />
             Login
-          </button>
+          </Link>
         </div>
 
         {/* Mobile Button */}
