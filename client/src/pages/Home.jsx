@@ -7,6 +7,7 @@ import Testimonials from '../components/Testimonials';
 import Newsletter from '../components/Newsletter';
 import Footer from '../components/Footer';
 import ScrollToTop from '../components/ScrollToTop';
+import api from "../api/axios";
 
 function Home() {
   return (

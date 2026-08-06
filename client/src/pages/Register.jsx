@@ -1,91 +1,195 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { User, Mail, Lock, Eye, EyeOff } from "lucide-react";
+import api from "../services/api";
+import api from "../api/axios";
+
+const register = async () => {
+  const { data } = await api.post("/auth/register", {
+    name,
+    email,
+    password,
+  });
+};
 
 const Register = () => {
+  const navigate = useNavigate();
+
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const handleRegister = async (e) => {
+    e.preventDefault();
+
+    if (!name || !email || !password || !confirmPassword) {
+      return alert("Please fill all fields.");
+    }
+
+    if (password !== confirmPassword) {
+      return alert("Passwords do not match.");
+    }
+
+    try {
+      setLoading(true);
+
+      const { data } = await api.post("/auth/register", {
+        name,
+        email,
+        password,
+      });
+
+      alert(data.message);
+
+      navigate("/login");
+    } catch (error) {
+      alert(error.response?.data?.message || "Registration Failed");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center bg-[#09090B] overflow-hidden">
-      <div className="absolute -top-20 left-0 w-80 h-80 bg-purple-600/30 blur-[120px] rounded-full" />
-      <div className="absolute bottom-0 right-0 w-96 h-96 bg-cyan-500/20 blur-[140px] rounded-full" />
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#09090B] px-6">
+
+      {/* Background Blur */}
+      <div className="absolute -top-20 left-0 h-80 w-80 rounded-full bg-purple-600/30 blur-[120px]" />
+      <div className="absolute bottom-0 right-0 h-96 w-96 rounded-full bg-cyan-500/20 blur-[140px]" />
 
       <motion.div
-        initial={{ opacity: 0, y: 40 }}
+        initial={{ opacity: 0, y: 35 }}
         animate={{ opacity: 1, y: 0 }}
-        className="relative w-full max-w-md mx-4"
+        transition={{ duration: 0.5 }}
+        className="relative w-full max-w-md"
       >
-        <div className="backdrop-blur-2xl bg-white/5 border border-white/10 rounded-3xl p-8">
-          <div className="flex flex-col items-center mb-8">
-            <img src="/novashop-logo.png" className="w-20 h-20" alt="" />
+        <form
+          onSubmit={handleRegister}
+          className="rounded-3xl border border-white/10 bg-white/5 p-8 backdrop-blur-2xl shadow-2xl"
+        >
+          {/* Logo */}
+          <div className="mb-8 flex flex-col items-center">
 
-            <h1 className="text-4xl font-black mt-3 bg-gradient-to-r from-purple-500 to-cyan-400 bg-clip-text text-transparent">
-              Create Account
+            <img
+              src="/logo.png"
+              alt="NovaShop"
+              className="mb-4 h-20 w-20 object-contain"
+            />
+
+            <h1 className="bg-gradient-to-r from-purple-500 via-pink-500 to-cyan-400 bg-clip-text text-4xl font-black text-transparent">
+              Join NovaShop
             </h1>
 
-            <p className="text-gray-400 mt-2">Join NovaShop Today</p>
+            <p className="mt-2 text-center text-gray-400">
+              Create your account and start shopping today.
+            </p>
           </div>
 
+          {/* Name */}
           <div className="relative mb-5">
-            <User className="absolute left-4 top-4 text-gray-400" />
+            <User
+              className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+              size={20}
+            />
 
             <input
+              type="text"
               placeholder="Full Name"
-              className="w-full bg-zinc-900/80 rounded-xl py-4 pl-12 pr-4 border border-white/10 outline-none"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="w-full rounded-xl border border-white/10 bg-zinc-900/80 py-4 pl-12 pr-4 text-white outline-none transition focus:border-purple-500"
             />
           </div>
 
+          {/* Email */}
           <div className="relative mb-5">
-            <Mail className="absolute left-4 top-4 text-gray-400" />
+            <Mail
+              className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+              size={20}
+            />
 
             <input
               type="email"
-              placeholder="Email"
-              className="w-full bg-zinc-900/80 rounded-xl py-4 pl-12 pr-4 border border-white/10 outline-none"
+              placeholder="Email Address"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full rounded-xl border border-white/10 bg-zinc-900/80 py-4 pl-12 pr-4 text-white outline-none transition focus:border-cyan-500"
             />
           </div>
 
+          {/* Password */}
           <div className="relative mb-5">
-            <Lock className="absolute left-4 top-4 text-gray-400" />
+            <Lock
+              className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+              size={20}
+            />
 
             <input
               type={showPassword ? "text" : "password"}
               placeholder="Password"
-              className="w-full bg-zinc-900/80 rounded-xl py-4 pl-12 pr-12 border border-white/10 outline-none"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full rounded-xl border border-white/10 bg-zinc-900/80 py-4 pl-12 pr-12 text-white outline-none transition focus:border-purple-500"
             />
 
-            <button onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-4">
-              {showPassword ? <EyeOff /> : <Eye />}
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
+            >
+              {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
             </button>
           </div>
 
-          <div className="relative mb-7">
-            <Lock className="absolute left-4 top-4 text-gray-400" />
+          {/* Confirm Password */}
+          <div className="relative mb-8">
+            <Lock
+              className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+              size={20}
+            />
 
             <input
               type={showConfirm ? "text" : "password"}
               placeholder="Confirm Password"
-              className="w-full bg-zinc-900/80 rounded-xl py-4 pl-12 pr-12 border border-white/10 outline-none"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              className="w-full rounded-xl border border-white/10 bg-zinc-900/80 py-4 pl-12 pr-12 text-white outline-none transition focus:border-cyan-500"
             />
 
-            <button onClick={() => setShowConfirm(!showConfirm)} className="absolute right-4 top-4">
-              {showConfirm ? <EyeOff /> : <Eye />}
+            <button
+              type="button"
+              onClick={() => setShowConfirm(!showConfirm)}
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
+            >
+              {showConfirm ? <EyeOff size={20} /> : <Eye size={20} />}
             </button>
           </div>
 
-          <button className="w-full py-4 rounded-xl bg-gradient-to-r from-purple-600 to-cyan-500 font-semibold hover:scale-105 transition">
-            Create Account
+          {/* Button */}
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full rounded-xl bg-gradient-to-r from-purple-600 via-fuchsia-500 to-cyan-500 py-4 text-lg font-semibold text-white transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-cyan-500/30 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {loading ? "Creating Account..." : "Create Account"}
           </button>
 
-          <p className="text-center text-gray-400 mt-6">
+          {/* Footer */}
+          <p className="mt-6 text-center text-gray-400">
             Already have an account?
-            <Link to="/login" className="text-cyan-400 ml-2">
+            <Link
+              to="/login"
+              className="ml-2 font-medium text-cyan-400 transition hover:text-purple-400"
+            >
               Login
             </Link>
           </p>
-        </div>
+        </form>
       </motion.div>
     </div>
   );

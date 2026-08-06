@@ -1,35 +1,78 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Eye, EyeOff, Mail, Lock } from "lucide-react";
+import { useAuth } from "../context/AuthContext";
+import api from "../services/api";
+import api from "../api/axios";
+
+const fetchProducts = async () => {
+  const { data } = await api.get("/products");
+  console.log(data);
+};
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
 
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const navigate = useNavigate();
+  const { login } = useAuth();
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+
+    try {
+      setLoading(true);
+
+      const { data } = await api.post("/auth/login", {
+        email,
+        password,
+      });
+
+      login(data.user, data.token);
+
+      alert("Login Successful 🎉");
+
+      navigate("/");
+    } catch (error) {
+      alert(error.response?.data?.message || "Login Failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <div className="relative min-h-screen flex items-center justify-center bg-[#09090B] overflow-hidden">
-      <div className="absolute -top-20 -left-20 w-80 h-80 bg-purple-600/30 rounded-full blur-[120px]" />
-      <div className="absolute bottom-0 right-0 w-96 h-96 bg-cyan-500/20 rounded-full blur-[140px]" />
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#09090B]">
+      <div className="absolute -top-20 -left-20 h-80 w-80 rounded-full bg-purple-600/30 blur-[120px]" />
+      <div className="absolute bottom-0 right-0 h-96 w-96 rounded-full bg-cyan-500/20 blur-[140px]" />
 
       <motion.div
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="relative w-full max-w-md mx-4"
+        className="relative mx-4 w-full max-w-md"
       >
-        <div className="backdrop-blur-2xl bg-white/5 border border-white/10 rounded-3xl p-8 shadow-2xl">
-          <div className="flex flex-col items-center mb-8">
+        <form
+          onSubmit={handleLogin}
+          className="rounded-3xl border border-white/10 bg-white/5 p-8 shadow-2xl backdrop-blur-2xl"
+        >
+          <div className="mb-8 flex flex-col items-center">
             <img
-              src="/novashop-logo.png"
+              src="/logo.png"
               alt="NovaShop"
-              className="w-20 h-20 mb-4"
+              className="mb-4 h-20 w-20 object-contain"
             />
 
-            <h1 className="text-4xl font-black bg-gradient-to-r from-purple-500 to-cyan-400 bg-clip-text text-transparent">
+            <h1 className="bg-gradient-to-r from-purple-500 via-pink-500 to-cyan-400 bg-clip-text text-4xl font-black text-transparent">
               NovaShop
             </h1>
 
-            <p className="text-gray-400 mt-2">Welcome Back 👋</p>
+            <p className="mt-2 text-gray-400">
+              Welcome back! Sign in to continue shopping.
+            </p>
           </div>
 
           <div className="relative mb-5">
@@ -38,7 +81,10 @@ const Login = () => {
             <input
               type="email"
               placeholder="Email Address"
-              className="w-full bg-zinc-900/80 border border-white/10 rounded-xl py-4 pl-12 pr-4 outline-none focus:border-purple-500 transition"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full rounded-xl border border-white/10 bg-zinc-900/80 py-4 pl-12 pr-4 outline-none transition focus:border-purple-500"
             />
           </div>
 
@@ -48,7 +94,10 @@ const Login = () => {
             <input
               type={showPassword ? "text" : "password"}
               placeholder="Password"
-              className="w-full bg-zinc-900/80 border border-white/10 rounded-xl py-4 pl-12 pr-12 outline-none focus:border-cyan-500 transition"
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full rounded-xl border border-white/10 bg-zinc-900/80 py-4 pl-12 pr-12 outline-none transition focus:border-cyan-500"
             />
 
             <button
@@ -60,20 +109,24 @@ const Login = () => {
             </button>
           </div>
 
-          <button className="w-full py-4 rounded-xl bg-gradient-to-r from-purple-600 to-cyan-500 font-semibold hover:scale-[1.02] transition duration-300 shadow-lg hover:shadow-purple-500/40">
-            Login
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full rounded-xl bg-gradient-to-r from-purple-600 to-cyan-500 py-4 font-semibold transition hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {loading ? "Logging in..." : "Login"}
           </button>
 
-          <p className="text-center text-gray-400 mt-6">
+          <p className="mt-6 text-center text-gray-400">
             Don't have an account?{" "}
             <Link
               to="/register"
-              className="text-cyan-400 hover:text-purple-400 transition"
+              className="text-cyan-400 transition hover:text-purple-400"
             >
               Register
             </Link>
           </p>
-        </div>
+        </form>
       </motion.div>
     </div>
   );

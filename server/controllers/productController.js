@@ -1,111 +1,42 @@
-const products = [
-  {
-    _id: "1",
-    name: "Wireless Headphones",
-    description: "Premium noise-cancelling wireless headphones.",
-    price: 149,
-    image: "/products/headphones.png",
-    category: "Electronics",
-    stock: 20,
-    rating: 4.8,
-  },
-  {
-    _id: "2",
-    name: "Smart Watch",
-    description: "Fitness tracking smartwatch with AMOLED display.",
-    price: 199,
-    image: "/products/smartwatch.png",
-    category: "Electronics",
-    stock: 15,
-    rating: 4.7,
-  },
-  {
-    _id: "3",
-    name: "Gaming Mouse",
-    description: "High precision RGB gaming mouse.",
-    price: 79,
-    image: "/products/mouse.png",
-    category: "Accessories",
-    stock: 30,
-    rating: 4.6,
-  },
-  {
-    _id: "4",
-    name: "Mechanical Keyboard",
-    description: "RGB mechanical keyboard with blue switches.",
-    price: 99,
-    image: "/products/keyboard.png",
-    category: "Accessories",
-    stock: 18,
-    rating: 4.8,
-  },
-  {
-    _id: "5",
-    name: "Laptop",
-    description: "Powerful laptop for work and gaming.",
-    price: 999,
-    image: "/products/laptop.png",
-    category: "Computers",
-    stock: 10,
-    rating: 4.9,
-  },
-  {
-    _id: "6",
-    name: "Smartphone",
-    description: "Latest flagship smartphone.",
-    price: 899,
-    image: "/products/smartphone.png",
-    category: "Mobiles",
-    stock: 25,
-    rating: 4.7,
-  },
-  {
-    _id: "7",
-    name: "Bluetooth Speaker",
-    description: "Portable Bluetooth speaker with deep bass.",
-    price: 129,
-    image: "/products/speaker.png",
-    category: "Audio",
-    stock: 22,
-    rating: 4.6,
-  },
-  {
-    _id: "8",
-    name: "DSLR Camera",
-    description: "Professional DSLR camera for creators.",
-    price: 1199,
-    image: "/products/camera.png",
-    category: "Photography",
-    stock: 8,
-    rating: 4.9,
-  },
-];
+import Product from "../models/Product.js";
 
 // Get all products
 export const getProducts = async (req, res) => {
   try {
-    res.status(200).json(products);
+    const products = await Product.find();
+
+    res.status(200).json({
+      success: true,
+      count: products.length,
+      products,
+    });
   } catch (error) {
     res.status(500).json({
+      success: false,
       message: error.message,
     });
   }
 };
 
-// Get one product
+// Get single product
 export const getProduct = async (req, res) => {
   try {
-    const product = products.find((item) => item._id === req.params.id);
+    const product = await Product.findById(req.params.id);
 
     if (!product) {
       return res.status(404).json({
+        success: false,
         message: "Product not found",
       });
     }
 
-    res.json(product);
+    res.status(200).json({
+      success: true,
+      product,
+    });
   } catch (error) {
     res.status(500).json({
+      success: false,
       message: error.message,
     });
   }
