@@ -3,15 +3,6 @@ import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { User, Mail, Lock, Eye, EyeOff } from "lucide-react";
 import api from "../services/api";
-import api from "../api/axios";
-
-const register = async () => {
-  const { data } = await api.post("/auth/register", {
-    name,
-    email,
-    password,
-  });
-};
 
 const Register = () => {
   const navigate = useNavigate();

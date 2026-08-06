@@ -4,12 +4,6 @@ import { motion } from "framer-motion";
 import { Eye, EyeOff, Mail, Lock } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import api from "../services/api";
-import api from "../api/axios";
-
-const fetchProducts = async () => {
-  const { data } = await api.get("/products");
-  console.log(data);
-};
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
