@@ -1,8 +1,9 @@
-declare module './context/AuthContext.jsx' {
-  export const AuthProvider: React.FC<React.PropsWithChildren<{}>>;
+declare module './context/AuthContext' {
+  import { ReactNode } from 'react';
+  export const AuthProvider: React.FC<{children: ReactNode}>;
 }
 
-declare module './context/CartContext.jsx' {
-  export const CartProvider: React.FC<React.PropsWithChildren<{}>>;
+declare module './context/CartContext' {
+  import { ReactNode } from 'react';
+  export const CartProvider: React.FC<{children: ReactNode}>;
 }
-
